@@ -100,12 +100,6 @@ jobs:
       - name: Install postgresql-client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Find psql
-        run: which psql
-
-      - name: Get psql version
-        run: command -v psql &> /dev/null
-
       - name: Migrate database
         run: SKIP_DOCKER=true ./scripts/init_db.sh
 

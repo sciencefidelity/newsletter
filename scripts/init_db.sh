@@ -22,9 +22,7 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 DB_PORT="${POSTGRES_PORT:=5432}"
 DB_HOST="${POSTGRES_HOST:=localhost}"
 
-# Allow skipping Docker if a local postgres is running
-USE_DOCKER="${SKIP_DOCKER:=false}"
-if [[ "${USE_DOCKER}" == true ]];
+if [[ -z "${SKIP_DOCKER}" ]]
 then
   echo "Using local Postgres"
 else

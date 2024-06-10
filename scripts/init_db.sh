@@ -38,6 +38,7 @@ else
     postgres -N 1000
 fi
 
+export PGPASSWORD="${DB_PASSWORD}"
 until psql -h "${DB_HOST}" -U "${DB_USER}" -p "${DB_PORT}" -d "postgres" -c '\q'; do
   echo "Postgres is still unavailable - sleeping"
   sleep 1

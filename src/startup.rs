@@ -5,6 +5,9 @@ use sqlx::PgPool;
 use std::{io, net::TcpListener};
 use tracing_actix_web::TracingLogger;
 
+/// # Errors
+///
+/// Will return `Err` if the `actix_web` server fails to start
 pub fn run(listener: TcpListener, db_pool: PgPool) -> io::Result<Server> {
     let db_pool = web::Data::new(db_pool);
 

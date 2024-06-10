@@ -9,24 +9,34 @@ pub struct Settings {
 #[derive(Deserialize)]
 pub struct DatabaseSettings {
     pub username: String,
+    pub password: String,
     pub port: u16,
     pub host: String,
     pub database_name: String,
 }
 
 impl DatabaseSettings {
+    #[must_use]
     pub fn connection_string(&self) -> String {
         format!(
-            "postgres://{}@{}:{}/{}",
-            self.username, self.host, self.port, self.database_name
+            "postgres://{}:{}@{}:{}/{}",
+            self.username, self.password, self.host, self.port, self.database_name
         )
     }
 
+    #[must_use]
     pub fn connection_string_without_db(&self) -> String {
-        format!("postgres://{}@{}:{}", self.username, self.host, self.port)
+        format!(
+            "postgres://{}:{}@{}:{}",
+            self.username, self.password, self.host, self.port
+        )
     }
 }
 
+/// # Errors
+///
+/// Will return `Err` if the `configuration.yaml` file cannot be found.
+#[allow(clippy::module_name_repetitions)]
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let settings = config::Config::builder()
         .add_source(config::File::new(

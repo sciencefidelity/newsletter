@@ -33,6 +33,10 @@ where
 /// Register a subscriber as global default to process spen data.
 ///
 /// It should only be called once!
+///
+/// # Panics
+///
+/// Will panic if `LogTracer` fails to initiate.
 pub fn init_subscriber(subscriber: impl Subscriber + Send + Sync) {
     LogTracer::init().expect("Failed to set logger");
     set_global_default(subscriber).expect("Failed to set subscriber");

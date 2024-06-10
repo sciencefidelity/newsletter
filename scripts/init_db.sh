@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Exit early if a command fails
-set -euo pipefail
+# set -euo pipefail
 # Print all commands (for debugging)
 # set -x
 

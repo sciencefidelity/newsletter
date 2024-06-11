@@ -41,14 +41,13 @@ impl DatabaseSettings {
         PgConnectOptions::new()
             .host(&self.host)
             .username(&self.username)
-            .password(&self.password.expose_secret())
+            .password(self.password.expose_secret())
             .port(self.port)
             .ssl_mode(ssl_mode)
     }
 
     #[must_use]
     pub fn with_db(&self) -> PgConnectOptions {
-        // TODO: lower log level from `INFO` to `TRACE`
         self.without_db().database(&self.database_name)
     }
 }
@@ -56,6 +55,11 @@ impl DatabaseSettings {
 /// # Errors
 ///
 /// Will return `Err` if the `configuration.yaml` file cannot be found.
+///
+/// # Panics
+///
+/// Will panic if `env::current_dir()` fails to determine current directory and
+/// configuration cannot be found
 #[allow(clippy::module_name_repetitions)]
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let base_path = env::current_dir().expect("failed to determine the current directory");
@@ -90,10 +94,11 @@ pub enum Environment {
 }
 
 impl Environment {
-    pub fn as_str(&self) -> &'static str {
+    #[must_use]
+    pub const fn as_str(&self) -> &'static str {
         match self {
-            Environment::Local => "local",
-            Environment::Production => "production",
+            Self::Local => "local",
+            Self::Production => "production",
         }
     }
 }
@@ -106,8 +111,7 @@ impl TryFrom<String> for Environment {
             "local" => Ok(Self::Local),
             "production" => Ok(Self::Production),
             other => Err(format!(
-                "{} is not a supported environment. Use either `local` or `production`.",
-                other
+                "{other} is not a supported environment. Use either `local` or `production`.",
             )),
         }
     }

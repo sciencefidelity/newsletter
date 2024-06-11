@@ -14,8 +14,8 @@ use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Regis
 /// `Send` and `Sync` to make it possible to pass it to `init_subscriber`
 /// later on.
 pub fn get_subscriber<Sink>(
-    name: String,
-    env_filter: String,
+    name: &str,
+    env_filter: &str,
     sink: Sink,
 ) -> impl Subscriber + Send + Sync
 where
@@ -23,7 +23,7 @@ where
 {
     let env_filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
-    let formatting_layer = BunyanFormattingLayer::new(name, sink);
+    let formatting_layer = BunyanFormattingLayer::new(name.into(), sink);
     Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)

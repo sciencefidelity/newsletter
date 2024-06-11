@@ -6,8 +6,8 @@ use std::{env, io, net::TcpListener};
 use uuid::Uuid;
 
 static TRACING: Lazy<()> = Lazy::new(|| {
-    let default_filter_level = "info".to_string();
-    let subscriber_name = "test".to_string();
+    let default_filter_level = "info";
+    let subscriber_name = "test";
     if env::var("TEST_LOG").is_ok() {
         let subscriber = get_subscriber(subscriber_name, default_filter_level, io::stdout);
         init_subscriber(subscriber);
@@ -42,23 +42,21 @@ async fn spawn_app() -> TestApp {
 }
 
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
-    let mut connection = PgConnection::connect(&config.connection_string_without_db())
+    let mut connection = PgConnection::connect_with(&config.without_db())
         .await
-        .expect("Failed to connect to Postgres.");
-
+        .expect("failed to connect to postgres");
     connection
         .execute(format!(r#"create database "{}";"#, config.database_name).as_str())
         .await
-        .expect("Failed to create database.");
+        .expect("failed to create database");
 
-    let connection_pool = PgPool::connect(&config.connection_string())
+    let connection_pool = PgPool::connect_with(config.with_db())
         .await
-        .expect("Failed to connect to Postgres.");
-
+        .expect("failed to connect to Postgres");
     sqlx::migrate!("./migrations")
         .run(&connection_pool)
         .await
-        .expect("Failed to migrate the database");
+        .expect("failed to migrate the database");
 
     connection_pool
 }

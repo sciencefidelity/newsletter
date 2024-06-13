@@ -24,9 +24,6 @@ DB_HOST="${POSTGRES_HOST:=localhost}"
 
 if [ -z "${SKIP_DOCKER}" ]
 then
-  echo "Using local Postgres"
-else
-  echo "Running Postgres on Docker"
   docker run \
     -e POSTGRES_USER=${DB_USER} \
     -e POSTGRES_PASSWORD=${DB_PASSWORD} \

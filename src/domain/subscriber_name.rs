@@ -7,10 +7,9 @@ impl SubscriberName {
     /// Returns an instance of `SubscriberName` if the input satisfies all
     /// our validation constraints on subscriber names.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// Will panic if the name does not satisfy validation constraints.
-    #[must_use]
+    /// Will return `Err` if the string does not satisfy name validation constraints.
     pub fn parse(s: String) -> Result<Self, String> {
         let is_empty_or_whitespace = s.trim().is_empty();
         let is_too_long = s.graphemes(true).count() > 256;

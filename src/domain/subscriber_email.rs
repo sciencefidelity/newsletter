@@ -4,6 +4,9 @@ use validator::ValidateEmail;
 pub struct SubscriberEmail(String);
 
 impl SubscriberEmail {
+    /// # Errors
+    ///
+    /// Will return `Err` if the string in to a valid email address.
     pub fn parse(s: String) -> Result<Self, String> {
         if ValidateEmail::validate_email(&s) {
             Ok(Self(s))
@@ -21,8 +24,8 @@ impl AsRef<str> for SubscriberEmail {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use claims::{assert_err, assert_ok};
+    use super::SubscriberEmail;
+    use claims::assert_err;
     use fake::{faker::internet::en::SafeEmail, Fake};
 
     #[test]
@@ -42,9 +45,19 @@ mod tests {
         let email = "@domain.com".to_owned();
         assert_err!(SubscriberEmail::parse(email));
     }
-    #[test]
-    fn valid_emails_are_parsed_successfully() {
-        let email = SafeEmail().fake();
-        assert_ok!(SubscriberEmail::parse(email));
+
+    #[derive(Debug, Clone)]
+    struct ValidEmailFixture(pub String);
+
+    impl quickcheck::Arbitrary for ValidEmailFixture {
+        fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
+            let email = SafeEmail().fake_with_rng(g);
+            Self(email)
+        }
+    }
+
+    #[quickcheck_macros::quickcheck]
+    fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
+        SubscriberEmail::parse(valid_email.0).is_ok()
     }
 }

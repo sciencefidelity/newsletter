@@ -4,6 +4,8 @@ pub use configuration::{get_configuration, DatabaseSettings};
 pub mod domain;
 pub use domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 
+pub mod email_client;
+
 pub mod routes;
 
 pub mod startup;

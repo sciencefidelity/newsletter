@@ -5,6 +5,7 @@ pub mod domain;
 pub use domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 
 pub mod email_client;
+pub use email_client::EmailClient;
 
 pub mod routes;
 

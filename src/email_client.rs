@@ -11,13 +11,21 @@ pub struct EmailClient {
 }
 
 impl EmailClient {
+    /// # Panics
+    ///
+    /// Will panic if the reqwest client fails to build.
+    #[must_use]
     pub fn new(
         base_url: String,
         sender: SubscriberEmail,
         authorization_token: Secret<String>,
         timeout: std::time::Duration,
     ) -> Self {
-        let http_client = Client::builder().timeout(timeout).build().unwrap();
+        let http_client = Client::builder()
+            .timeout(timeout)
+            .build()
+            .expect("failed to build reqwest client");
+
         Self {
             http_client,
             base_url,
@@ -26,6 +34,9 @@ impl EmailClient {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `Err` if the request returns an error response code
     pub async fn send_email(
         &self,
         recipient: SubscriberEmail,

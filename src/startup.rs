@@ -1,5 +1,5 @@
 use crate::configuration::Settings;
-use crate::routes::{health_check, subscribe};
+use crate::routes::{confirm, health_check, subscribe};
 use crate::{DatabaseSettings, EmailClient};
 use actix_web::{dev::Server, web, App, HttpServer};
 use sqlx::postgres::PgPoolOptions;
@@ -46,7 +46,12 @@ impl Application {
             .local_addr()
             .expect("listener failed to return port")
             .port();
-        let server = run(listener, connection_pool, email_client)?;
+        let server = run(
+            listener,
+            connection_pool,
+            email_client,
+            configuration.application.base_url,
+        )?;
 
         Ok(Self { port, server })
     }
@@ -69,6 +74,9 @@ pub fn get_connection_pool(configuration: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new().connect_lazy_with(configuration.with_db())
 }
 
+#[derive(Debug)]
+pub struct ApplicationBaseUrl(pub String);
+
 /// # Errors
 ///
 /// Will return `Err` if the `actix_web` server fails to start
@@ -76,17 +84,21 @@ pub fn run(
     listener: TcpListener,
     db_pool: PgPool,
     email_client: EmailClient,
+    base_url: String,
 ) -> io::Result<Server> {
     let db_pool = web::Data::new(db_pool);
     let email_client = web::Data::new(email_client);
 
+    let base_url = web::Data::new(ApplicationBaseUrl(base_url));
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
             .route("/health-check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
+            .route("/subscriptions/confirm", web::get().to(confirm))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
+            .app_data(base_url.clone())
     })
     .listen(listener)?
     .run();

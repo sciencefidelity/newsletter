@@ -10,7 +10,7 @@ pub use email_client::EmailClient;
 pub mod routes;
 
 pub mod startup;
-pub use startup::{get_connection_pool, run, Application};
+pub use startup::{get_connection_pool, run, Application, ApplicationBaseUrl};
 
 pub mod telemetry;
 pub use telemetry::{get_subscriber, init_subscriber};

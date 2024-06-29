@@ -42,8 +42,8 @@ impl fmt::Debug for SubscribeError {
 impl ResponseError for SubscribeError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
-            SubscribeError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            SubscribeError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ValidationError(_) => StatusCode::BAD_REQUEST,
+            Self::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -68,7 +68,7 @@ pub async fn subscribe(
         .await
         .context("Failed to insert new subscriber in the database.")?;
     let subscription_token = generate_subscription_token();
-    let _ = store_token(&mut transaction, subscriber_id, &subscription_token)
+    store_token(&mut transaction, subscriber_id, &subscription_token)
         .await
         .context("Failed to store the confirmation token for a new subscriber.")?;
     transaction
@@ -190,7 +190,7 @@ fn error_chain_fmt(
     e: &impl std::error::Error,
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
-    writeln!(f, "{}\n", e)?;
+    writeln!(f, "{e}\n")?;
     let mut current = e.source();
     while let Some(cause) = current {
         writeln!(f, "Caused by:\n\t{cause}")?;

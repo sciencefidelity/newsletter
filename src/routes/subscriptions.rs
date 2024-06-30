@@ -5,7 +5,7 @@ use chrono::Utc;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::Deserialize;
 use sqlx::{Executor, PgPool, Postgres, Transaction};
-use std::fmt;
+use std::{error, fmt, iter};
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -40,7 +40,7 @@ impl fmt::Debug for SubscribeError {
 }
 
 impl ResponseError for SubscribeError {
-    fn status_code(&self) -> actix_web::http::StatusCode {
+    fn status_code(&self) -> StatusCode {
         match self {
             Self::ValidationError(_) => StatusCode::BAD_REQUEST,
             Self::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -89,7 +89,7 @@ pub async fn subscribe(
 /// Generate a random 25-character-long case-sensitive subscription token.
 fn generate_subscription_token() -> String {
     let mut rng = thread_rng();
-    std::iter::repeat_with(|| rng.sample(Alphanumeric))
+    iter::repeat_with(|| rng.sample(Alphanumeric))
         .map(char::from)
         .take(25)
         .collect()
@@ -165,20 +165,20 @@ pub async fn store_token(
 
 pub struct StoreTokenError(sqlx::Error);
 
-impl std::error::Error for StoreTokenError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl error::Error for StoreTokenError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         Some(&self.0)
     }
 }
 
-impl std::fmt::Debug for StoreTokenError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for StoreTokenError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         error_chain_fmt(self, f)
     }
 }
 
-impl std::fmt::Display for StoreTokenError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for StoreTokenError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "A database error was encountered while trying to store a subscription token."
@@ -186,10 +186,7 @@ impl std::fmt::Display for StoreTokenError {
     }
 }
 
-fn error_chain_fmt(
-    e: &impl std::error::Error,
-    f: &mut std::fmt::Formatter<'_>,
-) -> std::fmt::Result {
+pub fn error_chain_fmt(e: &impl error::Error, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     writeln!(f, "{e}\n")?;
     let mut current = e.source();
     while let Some(cause) = current {

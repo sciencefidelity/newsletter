@@ -186,6 +186,9 @@ impl fmt::Display for StoreTokenError {
     }
 }
 
+/// # Errors
+///
+/// Will return `Err` if the source cannot be parsed from the error chain.
 pub fn error_chain_fmt(e: &impl error::Error, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     writeln!(f, "{e}\n")?;
     let mut current = e.source();

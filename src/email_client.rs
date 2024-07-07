@@ -40,7 +40,7 @@ impl EmailClient {
     /// Will return `Err` if the request returns an error response code
     pub async fn send_email(
         &self,
-        recipient: SubscriberEmail,
+        recipient: &SubscriberEmail,
         subject: &str,
         html_content: &str,
         text_content: &str,

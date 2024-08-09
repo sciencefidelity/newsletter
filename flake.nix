@@ -19,9 +19,12 @@
       {
         devShells.default = mkShell {
           buildInputs = [
-            docker-client
+            bunyan-rs
+            cargo-audit
+            cargo-expand
+            cargo-tarpaulin
+            cargo-udeps
             pkg-config
-            postgresql
             sqlx-cli
             (rust-bin.stable.latest.default.override {
               extensions = [ "rust-analyzer" "rust-src" ];

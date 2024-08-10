@@ -28,7 +28,10 @@
             })
           ];
 
-          shellHook = ''
+          shellHook = /*bash*/ ''
+            if [ "$(ulimit -Sn)" -lt "8192" ]; then
+              >&2 echo "⚠️ ulimit too small. Run 'ulimit -Sn 8192' to avoid problems running tests"
+            fi
           '';
         };
       }

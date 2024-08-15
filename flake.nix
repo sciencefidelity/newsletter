@@ -24,7 +24,9 @@
             cargo-expand
             cargo-tarpaulin
             cargo-udeps
+            docker-client
             pkg-config
+            postgresql
             sqlx-cli
             (rust-bin.stable.latest.default.override {
               extensions = [ "rust-analyzer" "rust-src" ];
@@ -32,6 +34,7 @@
           ];
 
           shellHook = /*bash*/ ''
+            git pull
             if [ "$(ulimit -Sn)" -lt "8192" ]; then
               >&2 echo "⚠️ ulimit too small. Run 'ulimit -Sn 8192' to avoid problems running tests"
             fi

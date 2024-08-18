@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn empty_string_is_rejected() {
-        let name = "".to_owned();
+        let name = String::new();
         assert_err!(SubscriberName::parse(name));
     }
 

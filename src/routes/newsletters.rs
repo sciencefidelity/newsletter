@@ -42,12 +42,11 @@ impl fmt::Debug for PublishError {
 impl ResponseError for PublishError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            PublishError::UnexpectedError(_) => {
-                HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
-            }
-            PublishError::AuthError(_) => {
+            Self::UnexpectedError(_) => HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR),
+            Self::AuthError(_) => {
                 let mut response = HttpResponse::new(StatusCode::UNAUTHORIZED);
-                let header_value = HeaderValue::from_str(r#"Basic realm="publish""#).unwrap();
+                let header_value = HeaderValue::from_str(r#"Basic realm="publish""#)
+                    .expect("couldn't parse header value");
                 response
                     .headers_mut()
                     .insert(header::WWW_AUTHENTICATE, header_value);
@@ -126,7 +125,7 @@ async fn validate_credentials(
             .to_string(),
     );
     if let Some((stored_user_id, stored_password_hash)) =
-        get_stored_credentials(&credentials.username, &pool)
+        get_stored_credentials(&credentials.username, pool)
             .await
             .map_err(PublishError::UnexpectedError)?
     {
@@ -172,6 +171,7 @@ fn verify_password_hash(
 /// # Errors
 ///
 /// Will return `Err` if the stored email address in invalid.
+#[allow(clippy::future_not_send)]
 #[tracing::instrument(
     name = "Publish a newsletter issue",
     skip(body, pool, email_client, request),

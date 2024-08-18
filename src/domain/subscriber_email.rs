@@ -38,7 +38,7 @@ mod tests {
 
     #[test]
     fn empty_string_is_rejected() {
-        let email = "".to_owned();
+        let email = String::new();
         assert_err!(SubscriberEmail::parse(email));
     }
 

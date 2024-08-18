@@ -71,8 +71,8 @@ impl TestApp {
             confirmation_link
         };
 
-        let html = get_link(&body["HtmlBody"].as_str().unwrap());
-        let plain_text = get_link(&body["TextBody"].as_str().unwrap());
+        let html = get_link(body["HtmlBody"].as_str().unwrap());
+        let plain_text = get_link(body["TextBody"].as_str().unwrap());
         ConfirmationLinks { html, plain_text }
     }
 }
@@ -95,10 +95,10 @@ pub async fn spawn_app() -> TestApp {
     let application =
         Application::build(configuration.clone()).expect("Failed to build application.");
     let application_port = application.port();
-    let _ = tokio::spawn(application.run_until_stopped());
+    tokio::spawn(application.run_until_stopped());
 
     let test_app = TestApp {
-        address: format!("http://127.0.0.1:{}", application_port),
+        address: format!("http://127.0.0.1:{application_port}"),
         port: application_port,
         db_pool: get_connection_pool(&configuration.database),
         email_server,

@@ -93,14 +93,12 @@ mod tests {
     impl wiremock::Match for SendEmailBodyMatcher {
         fn matches(&self, request: &Request) -> bool {
             let result: Result<serde_json::Value, _> = serde_json::from_slice(&request.body);
-            if let Ok(body) = result {
+            result.map_or(false, |body| {
                 body.get("From").is_some()
                     && body.get("To").is_some()
                     && body.get("Subject").is_some()
                     && body.get("TextBody").is_some()
-            } else {
-                false
-            }
+            })
         }
     }
 
@@ -116,7 +114,7 @@ mod tests {
 
     /// Generate a random subscriber email.
     fn email() -> SubscriberEmail {
-        SubscriberEmail::parse(SafeEmail().fake()).unwrap()
+        SubscriberEmail::parse(SafeEmail().fake()).expect("failed to parse email")
     }
 
     /// Get a test instance of `EmailClient`.

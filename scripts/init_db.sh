@@ -20,7 +20,7 @@ DB_USER="${POSTGRES_USER:=postgres}"
 DB_PASSWORD="${POSTGRES_PASSWORD:=password}"
 DB_NAME="${POSTGRES_DB:=newsletter}"
 DB_PORT="${POSTGRES_PORT:=5432}"
-DB_HOST="${POSTGRES_HOST:=192.168.1.78}"
+DB_HOST="${POSTGRES_HOST:=localhost}"
 
 if [ -z "${SKIP_DOCKER}" ]
 then
@@ -41,7 +41,7 @@ until psql -h "${DB_HOST}" -U "${DB_USER}" -p "${DB_PORT}" -d "postgres" -c '\q'
   sleep 1
 done
 
-echo "Postgres is up and running on port ${DB_PORT} - running migrations now!"
+echo "Postgres is up and running on ${DB_HOST}:${DB_PORT} - running migrations now!"
 
 DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 export DATABASE_URL

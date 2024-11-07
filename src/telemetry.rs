@@ -11,7 +11,7 @@ use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Regis
 /// We are using `impl Subscriber` as return type to avoid having to
 /// spell out the actual type of the returned subscriber, which is
 /// indeed quite complex.
-/// We nee to explicitly call out that the returned subscriber is
+/// We need to explicitly call out that the returned subscriber is
 /// `Send` and `Sync` to make it possible to pass it to `init_subscriber`
 /// later on.
 pub fn get_subscriber<Sink>(

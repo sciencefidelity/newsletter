@@ -28,6 +28,7 @@
             pkg-config
             postgresql
             sqlx-cli
+            taplo
             (rust-bin.stable.latest.default.override {
               extensions = [ "rust-analyzer" "rust-src" ];
             })

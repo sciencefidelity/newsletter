@@ -1,8 +1,8 @@
 use crate::{ApplicationBaseUrl, EmailClient, NewSubscriber, SubscriberEmail, SubscriberName};
-use actix_web::{http::StatusCode, web, HttpResponse, ResponseError};
+use actix_web::{HttpResponse, ResponseError, http::StatusCode, web};
 use anyhow::Context;
 use chrono::Utc;
-use rand::{distributions::Alphanumeric, thread_rng, Rng};
+use rand::{Rng, distributions::Alphanumeric, thread_rng};
 use serde::Deserialize;
 use sqlx::{Executor, PgPool, Postgres, Transaction};
 use std::{error, fmt, iter};
@@ -131,7 +131,7 @@ pub async fn insert_subscriber(
     let query = sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at, status)
-        VALUES ($1, $2, $3, $4, 'pending_confirmation')
+        VALUES ($1, $2, $3, $4, 'pending_confirmation');
         "#,
         subscriber_id,
         new_subscriber.email.as_ref(),
@@ -153,8 +153,10 @@ pub async fn store_token(
     subscription_token: &str,
 ) -> Result<(), StoreTokenError> {
     let query = sqlx::query!(
-        r#"INSERT INTO subscription_tokens (subscription_token, subscriber_id)
-        VALUES ($1, $2)"#,
+        r#"
+        INSERT INTO subscription_tokens (subscription_token, subscriber_id)
+        VALUES ($1, $2);
+        "#,
         subscription_token,
         subscriber_id
     );

@@ -1,3 +1,4 @@
+#![allow(clippy::missing_panics_doc, clippy::missing_errors_doc)]
 pub mod health_check;
 pub use health_check::health_check;
 

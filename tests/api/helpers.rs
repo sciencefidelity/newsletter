@@ -1,14 +1,14 @@
-use argon2::{password_hash::SaltString, Argon2, PasswordHasher};
 use argon2::{Algorithm, Params, Version};
-use newsletter::{get_configuration, get_connection_pool, get_subscriber, init_subscriber};
+use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 use newsletter::{Application, DatabaseSettings};
-use once_cell::sync::Lazy;
+use newsletter::{get_configuration, get_connection_pool, get_subscriber, init_subscriber};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
+use std::sync::LazyLock;
 use std::{env, io};
 use uuid::Uuid;
 use wiremock::MockServer;
 
-static TRACING: Lazy<()> = Lazy::new(|| {
+static TRACING: LazyLock<()> = LazyLock::new(|| {
     let default_filter_level = "info";
     let subscriber_name = "test";
     if env::var("TEST_LOG").is_ok() {
@@ -36,7 +36,7 @@ pub struct ConfirmationLinks {
 impl TestApp {
     pub async fn post_subscriptions(&self, body: String) -> reqwest::Response {
         reqwest::Client::new()
-            .post(&format!("{}/subscriptions", &self.address))
+            .post(format!("{}/subscriptions", &self.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(body)
             .send()
@@ -46,7 +46,7 @@ impl TestApp {
 
     pub async fn post_newsletters(&self, body: serde_json::Value) -> reqwest::Response {
         reqwest::Client::new()
-            .post(&format!("{}/newsletters", &self.address))
+            .post(format!("{}/newsletters", &self.address))
             .basic_auth(&self.test_user.username, Some(&self.test_user.password))
             .json(&body)
             .send()
@@ -78,7 +78,7 @@ impl TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
-    Lazy::force(&TRACING);
+    LazyLock::force(&TRACING);
 
     let email_server = MockServer::start().await;
 
@@ -157,7 +157,7 @@ impl TestUser {
         .to_string();
         sqlx::query!(
             "INSERT INTO users (user_id, username, password_hash)
-            VALUES ($1, $2, $3)",
+VALUES ($1, $2, $3)",
             self.user_id,
             self.username,
             password_hash,

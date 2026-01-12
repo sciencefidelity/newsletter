@@ -83,7 +83,7 @@ mod tests {
     use super::{EmailClient, SubscriberEmail};
     use claims::{assert_err, assert_ok};
     use fake::faker::lorem::en::{Paragraph, Sentence};
-    use fake::{faker::internet::en::SafeEmail, Fake, Faker};
+    use fake::{Fake, Faker, faker::internet::en::SafeEmail};
     use secrecy::Secret;
     use wiremock::matchers::{any, header, header_exists, method, path};
     use wiremock::{Mock, MockServer, Request, ResponseTemplate};
@@ -93,7 +93,7 @@ mod tests {
     impl wiremock::Match for SendEmailBodyMatcher {
         fn matches(&self, request: &Request) -> bool {
             let result: Result<serde_json::Value, _> = serde_json::from_slice(&request.body);
-            result.map_or(false, |body| {
+            result.is_ok_and(|body| {
                 body.get("From").is_some()
                     && body.get("To").is_some()
                     && body.get("Subject").is_some()
